@@ -98,7 +98,7 @@ const App = () => {
         );
       })
       .catch((_) => {
-        handleSetMessage("Updating failed!");
+        handleSetMessage(`Updating failed!`);
       });
   };
 
@@ -134,7 +134,7 @@ const App = () => {
   };
 
   const createBlogForm = () => (
-    <Togglable>
+    <Togglable buttonLabel="Create blog" ref={blogFormRef}>
       <BlogForm handleCreateBlog={handleCreateBlog} />
     </Togglable>
   );

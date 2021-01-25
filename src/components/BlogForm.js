@@ -26,6 +26,7 @@ const BlogForm = ({ handleCreateBlog }) => {
       <div>
         Author
         <input
+          id="author"
           type="text"
           value={blogInfo.author}
           name="Author"
