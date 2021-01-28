@@ -30,7 +30,6 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then((blogs) => {
-      console.log("result: ", blogs);
       setBlogs(orderBlogByLikes(blogs));
     });
   }, []);
@@ -162,19 +161,21 @@ const App = () => {
       ) : (
         <div>
           <p>{user.name} logged in</p>
-          <button onClick={handleLogout}>Logout</button>
+          <button id="logout-button" onClick={handleLogout}>Logout</button>
           <h2>blogs</h2>
           {createBlogForm()}
           <br />
-          {blogs.map((blog, index) => (
-            <Blog
-              key={index}
-              blog={blog}
-              updateLikes={() => updateLikes(index)}
-              deleteBlogHandler={() => deleteBlogHandler(index)}
-              username={user.name}
-            />
-          ))}
+          <div id="all-blogs">
+            {blogs.map((blog, index) => (
+              <Blog
+                key={index}
+                blog={blog}
+                updateLikes={() => updateLikes(index)}
+                deleteBlogHandler={() => deleteBlogHandler(index)}
+                username={user.name}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

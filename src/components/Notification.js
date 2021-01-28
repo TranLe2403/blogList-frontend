@@ -4,7 +4,7 @@ const Notification = ({ message }) => {
   if (message === null) {
     return null;
   }
-  const isError = message !== null && message.includes("Wrong");
+  const isError = message && message.includes("Wrong");
   const messageStyle = {
     color: isError ? "red" : "green",
     background: "lightgrey",
@@ -17,7 +17,9 @@ const Notification = ({ message }) => {
 
   return (
     <div>
-      <div style={messageStyle}>{message}</div>
+      <div className="error" style={messageStyle}>
+        {message}
+      </div>
       <br />
     </div>
   );
