@@ -1,4 +1,4 @@
-describe("Note app", function () {
+describe("Blog app", function () {
   beforeEach(function () {
     cy.request("POST", "http://localhost:3000/api/testing/reset");
     const user1 = {
@@ -57,7 +57,7 @@ describe("Note app", function () {
       cy.contains("a blog created by cypress TL");
     });
 
-    describe("and a note exists", function () {
+    describe("modified blog", function () {
       beforeEach(function () {
         cy.contains("Create blog").click();
 

@@ -1,47 +1,27 @@
-import React, { useState } from "react";
-const Blog = ({ blog, updateLikes, deleteBlogHandler, username }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
+import React from "react";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
 
-  const [detailVisible, setDetailVisible] = useState(false);
+const BlogStyle = styled.div`
+  border: solid;
+  border-radius: 20px;
+  border-width: 1px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 300px;
+  height: 50px;
+  background: white;
+`;
 
-  const toggleVisibility = () => {
-    setDetailVisible(!detailVisible);
-  };
-
+const Blog = ({ blog }) => {
   return (
-    <div style={blogStyle}>
-      <div>
-        <span id="title">
-          {blog.title} {blog.author}
-        </span>
-        <button id="view-or-hide" onClick={toggleVisibility}>
-          {detailVisible ? "Hide" : "View"}
-        </button>
-      </div>
-      {detailVisible && (
-        <div className="blogDetails">
-          <p>url: {blog.url}</p>
-          <p id="like-numbers">
-            Likes: <span id="likes">{blog.likes}</span>
-            <button id="like-button" onClick={updateLikes}>
-              Like
-            </button>
-          </p>
-          <p>{blog.user.name}</p>
-          {username === blog.user.name && (
-            <button id="delete-button" onClick={deleteBlogHandler}>
-              Delete Blog
-            </button>
-          )}
-        </div>
-      )}
-    </div>
+    <BlogStyle>
+      <Link to={`/blogs/${blog.id}`}>
+        {blog.title} {blog.author}
+      </Link>
+    </BlogStyle>
   );
 };
 

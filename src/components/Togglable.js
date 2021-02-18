@@ -1,5 +1,6 @@
 import React, { useState, useImperativeHandle } from "react";
 import PropTypes from "prop-types";
+import Typography from "../Typography";
 
 const Togglable = React.forwardRef((props, ref) => {
   const [loginVisible, setLoginVisible] = useState(false);
@@ -19,12 +20,16 @@ const Togglable = React.forwardRef((props, ref) => {
   return (
     <div>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+        <Typography buttonType="toggle" onClick={toggleVisibility}>
+          {props.buttonLabel}
+        </Typography>
       </div>
 
       <div style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>Cancel</button>
+        <Typography buttonType="cancel" onClick={toggleVisibility}>
+          Cancel
+        </Typography>
       </div>
     </div>
   );

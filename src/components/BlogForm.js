@@ -1,6 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { addBlog } from "../reducers/bloglistReducer";
+import { notificationContent } from "../reducers/notiReducer";
+import Typography from "../Typography";
 
-const BlogForm = ({ handleCreateBlog }) => {
+import Togglable from "./Togglable";
+
+import styled from "styled-components";
+
+const TextField = styled.input`
+  margin: 10px;
+  width: 60%;
+  border: none;
+  background-color: transparent;
+  border-bottom: thin solid black;
+  outline: none;
+`;
+
+const InputContainer = styled.div`
+  display: flex;
+  width: 300px;
+  justify-content: space-between;
+`;
+
+const BlogFormCreation = () => {
+  const dispatch = useDispatch();
+  const blogFormRef = useRef();
+
+  const handleCreateBlog = (blogObject) => {
+    blogFormRef.current.toggleVisibility(); //using ref to hide blog form after adding a blog
+    dispatch(addBlog(blogObject));
+
+    dispatch(
+      notificationContent(
+        `A new blog ${blogObject.title} by ${blogObject.author}`,
+        5
+      )
+    );
+  };
+
+  return (
+    <Togglable buttonLabel="Create blog" ref={blogFormRef}>
+      <BlogForm handleCreateBlog={handleCreateBlog} />
+    </Togglable>
+  );
+};
+
+export const BlogForm = ({ handleCreateBlog }) => {
   const [blogInfo, setBlogInfo] = useState({ title: "", author: "", url: "" });
 
   const addBlog = (event) => {
@@ -12,9 +58,9 @@ const BlogForm = ({ handleCreateBlog }) => {
 
   return (
     <form onSubmit={addBlog}>
-      <div>
-        Title
-        <input
+      <InputContainer>
+        <p>Title:</p>
+        <TextField
           id="title"
           type="text"
           value={blogInfo.title}
@@ -23,10 +69,10 @@ const BlogForm = ({ handleCreateBlog }) => {
             setBlogInfo({ ...blogInfo, title: target.value })
           }
         />
-      </div>
-      <div>
-        Author
-        <input
+      </InputContainer>
+      <InputContainer>
+        <p>Author:</p>
+        <TextField
           id="author"
           type="text"
           value={blogInfo.author}
@@ -35,10 +81,10 @@ const BlogForm = ({ handleCreateBlog }) => {
             setBlogInfo({ ...blogInfo, author: target.value })
           }
         />
-      </div>
-      <div>
-        URL
-        <input
+      </InputContainer>
+      <InputContainer>
+        <p>URL:</p>
+        <TextField
           id="url"
           type="text"
           value={blogInfo.url}
@@ -47,13 +93,13 @@ const BlogForm = ({ handleCreateBlog }) => {
             setBlogInfo({ ...blogInfo, url: target.value })
           }
         />
-      </div>
+      </InputContainer>
       <br />
-      <button id="create-button" type="submit">
+      <Typography buttonType="create" id="create-button" type="submit">
         Create
-      </button>
+      </Typography>
     </form>
   );
 };
 
-export default BlogForm;
+export default BlogFormCreation;

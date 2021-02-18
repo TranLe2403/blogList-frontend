@@ -1,38 +1,47 @@
-import React, { useState, useEffect, useRef } from "react";
-import Blog from "./components/Blog";
+import React, { useState, useEffect } from "react";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
 import Togglable from "./components/Togglable";
-import BlogForm from "./components/BlogForm";
+import { notificationContent } from "./reducers/notiReducer";
+import { useDispatch } from "react-redux";
+import { initialBloglist } from "./reducers/bloglistReducer";
+import { initialUsers } from "./reducers/userReducer";
+import { Switch, Route, Link } from "react-router-dom";
+import Users from "./components/Users";
+import Blogs from "./components/Blogs";
+import SingleUser from "./components/SingleUser";
+import SingleBlog from "./components/SingleBlog";
+import Typography from "./Typography";
+import styled from "styled-components";
+import "./App.css";
+
+const UserCover = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const AppContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-image: linear-gradient(#c6dea6, #7ebdc3, #7a6263);
+  width: 100vw;
+  height: 100vh;
+`;
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
 
-  const blogFormRef = useRef();
-
-  const orderBlogByLikes = (blogs) => {
-    let blogA = 0;
-    let blogB = 0;
-
-    return blogs.sort((a, b) => {
-      blogA = a.likes;
-      blogB = b.likes;
-
-      return blogA > blogB ? -1 : blogA < blogB ? 1 : 0;
-    });
-  };
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => {
-      setBlogs(orderBlogByLikes(blogs));
-    });
-  }, []);
+    dispatch(initialBloglist());
+    dispatch(initialUsers());
+  }, [dispatch]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("userInfo");
@@ -57,48 +66,13 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (exception) {
-      handleSetMessage("Wrong username or password");
+      dispatch(notificationContent("Wrong username or password", 5));
     }
-  };
-
-  const handleSetMessage = (message) => {
-    setErrorMessage(message);
-    setTimeout(() => {
-      setErrorMessage(null);
-    }, 3000);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("userInfo");
     window.location.reload();
-  };
-
-  const updateLikes = (index) => {
-    const blogsCopy = [...blogs];
-
-    const changedInfo = {
-      user: blogsCopy[index].user.id,
-      likes: blogsCopy[index].likes + 1,
-      author: blogsCopy[index].author,
-      title: blogsCopy[index].title,
-      url: blogsCopy[index].url,
-    };
-
-    blogService
-      .likesUpdate(blogsCopy[index].id, changedInfo)
-      .then((response) => {
-        setBlogs(
-          blogsCopy.map((blog) =>
-            blog.id !== blogsCopy[index].id ? blog : response
-          )
-        );
-        handleSetMessage(
-          `Blog "${response.title}" has been updated successfully!`
-        );
-      })
-      .catch((_) => {
-        handleSetMessage(`Updating failed!`);
-      });
   };
 
   const loginForm = () => {
@@ -115,70 +89,53 @@ const App = () => {
     );
   };
 
-  const handleCreateBlog = (blogObject) => {
-    const blogsCopy = [...blogs];
-    blogFormRef.current.toggleVisibility(); //using ref to hide blog form after adding a blog
-    blogService
-      .create(blogObject)
-      .then((returnedBlog) => {
-        const allBlogs = blogsCopy.concat(returnedBlog);
-        setBlogs(allBlogs);
-        handleSetMessage(
-          `A new blog ${blogObject.title} by ${blogObject.author}`
-        );
-      })
-      .catch((err) => {
-        handleSetMessage(err.response.data.error);
-      });
-  };
-
-  const createBlogForm = () => (
-    <Togglable buttonLabel="Create blog" ref={blogFormRef}>
-      <BlogForm handleCreateBlog={handleCreateBlog} />
-    </Togglable>
-  );
-
-  const deleteBlogHandler = async (index) => {
-    const deleteConfirm = window.confirm(
-      `Delete blog ${blogs[index].title} by ${blogs[index].author} ?`
-    );
-
-    const blogsCopy = [...blogs];
-
-    if (!deleteConfirm) return;
-    await blogService.deleteBlog(blogsCopy[index].id);
-
-    blogsCopy.splice(index, 1);
-    setBlogs(blogsCopy);
-  };
+  const padding = { paddingRight: 10 };
 
   return (
-    <div>
-      <h2>blogs</h2>
-      <Notification message={errorMessage} />
-      {user === null ? (
+    <AppContainer>
+      <h2>Blog Application</h2>
+      <Notification />
+      {!user ? (
         loginForm()
       ) : (
-        <div>
-          <p>{user.name} logged in</p>
-          <button id="logout-button" onClick={handleLogout}>Logout</button>
-          <h2>blogs</h2>
-          {createBlogForm()}
-          <br />
-          <div id="all-blogs">
-            {blogs.map((blog, index) => (
-              <Blog
-                key={index}
-                blog={blog}
-                updateLikes={() => updateLikes(index)}
-                deleteBlogHandler={() => deleteBlogHandler(index)}
-                username={user.name}
-              />
-            ))}
-          </div>
+        <div style={{ width: 310 }}>
+          <Link style={padding} to="/">
+            Home
+          </Link>
+          <Link style={padding} to="/users">
+            Users
+          </Link>
+
+          <UserCover>
+            <p>{user.name} logged in</p>
+            <Typography
+              buttonType="cancel"
+              id="logout-button"
+              onClick={handleLogout}
+            >
+              Logout
+            </Typography>
+          </UserCover>
+          <Switch>
+            <Route path="/users/:id">
+              <SingleUser />
+            </Route>
+
+            <Route path="/blogs/:id">
+              <SingleBlog />
+            </Route>
+
+            <Route path="/users" exact>
+              <Users />
+            </Route>
+
+            <Route path="/">
+              <Blogs user={user} />
+            </Route>
+          </Switch>
         </div>
       )}
-    </div>
+    </AppContainer>
   );
 };
 
