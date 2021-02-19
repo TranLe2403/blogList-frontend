@@ -5,16 +5,20 @@ import { Link } from "react-router-dom";
 const Users = () => {
   const getUsers = useSelector((state) => state.users);
 
+  if (!getUsers) return null;
+
   return (
     <div>
       <h3>Users</h3>
       <table>
-        <tr>
-          <th />
-          <th style={{ paddingLeft: 10 }}>Blogs Created</th>
-        </tr>
-        {getUsers &&
-          getUsers.map((user) => {
+        <thead>
+          <tr>
+            <th></th>
+            <th style={{ paddingLeft: 10 }}>Blogs Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {getUsers.map((user) => {
             return (
               <tr key={user.id}>
                 <td>
@@ -29,6 +33,7 @@ const Users = () => {
               </tr>
             );
           })}
+        </tbody>
       </table>
     </div>
   );

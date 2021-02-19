@@ -4,12 +4,13 @@ import { useParams } from "react-router-dom";
 
 const SingleUser = () => {
   const id = useParams().id;
+  console.log("id:", id);
   const getUsers = useSelector((state) => state.users);
   if (!getUsers) {
     return null;
   }
 
-  const getUserIndex = getUsers.findIndex((item) => (item.id = id));
+  const getUserIndex = getUsers.findIndex((item) => (item.id === id));
 
   return (
     <div>
